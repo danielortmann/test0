@@ -1,3 +1,56 @@
+import os
+import json
+import numpy as np
+
+def save_simulation(data_dict, param_dict, run_dir):
+    """
+    Save simulation results and parameters to a dedicated folder.
+
+    Args:
+        data_dict (dict): Dictionary of NumPy arrays.
+        param_dict (dict): Dictionary of parameters (JSON-serializable).
+        run_dir (str): Directory for this simulation run.
+    """
+    os.makedirs(run_dir, exist_ok=True)
+
+    data_path = os.path.join(run_dir, "data.npz")
+    param_path = os.path.join(run_dir, "params.json")
+
+    np.savez(data_path, **data_dict)
+
+    with open(param_path, "w") as f:
+        json.dump(param_dict, f, indent=4)
+
+    print(f"Saved data to:    {data_path}")
+    print(f"Saved params to:  {param_path}")
+    return  # Explicitly return None
+
+
+def load_simulation(run_dir):
+    """
+    Load simulation results and parameters from a run folder.
+
+    Args:
+        run_dir (str): Path to the folder containing 'data.npz' and 'params.json'.
+
+    Returns:
+        data_dict (dict): Dictionary of NumPy arrays.
+        param_dict (dict): Dictionary of parameters.
+    """
+    data_path = os.path.join(run_dir, "data.npz")
+    param_path = os.path.join(run_dir, "params.json")
+
+    data = np.load(data_path)
+    data_dict = {key: data[key] for key in data.files}
+
+    with open(param_path, "r") as f:
+        param_dict = json.load(f)
+
+    return data_dict, param_dict
+
+
+
+####################
 import numpy as np
 import matplotlib.pyplot as plt
 import time
